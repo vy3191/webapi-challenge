@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router({mergeParams:true});
 const projects = require("../../data/helpers/projectModel");
+const actionRoutes = require("../actions/action");
+
+router.use("/:id/actions",actionRoutes);
 
 router.get("/", async (req,res) => {
     try {
