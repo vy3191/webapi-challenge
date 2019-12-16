@@ -11,6 +11,10 @@ router.get("/", async (req,res) => {
     }
 });
 
+router.get("/:id", validateById, (req,res) => {
+     res.status(200).json(req.project);
+})
+
 router.post("/", validateProject, async(req,res) => {
      try {
       const playload = {
@@ -18,9 +22,8 @@ router.post("/", validateProject, async(req,res) => {
         description:req.body.description
      }
        res.status(200).json( await projects.insert(playload));
-
      }catch(error) {
-        
+      res.status(500).json({msg:error}); 
      }
 
 });
@@ -39,7 +42,15 @@ router.put("/:id",validateProject, validateById, async (req,res) => {
     }
 });
 
-
+router.delete("/:id", validateById, async (req,res) => {
+   try {
+      const deleted = await projects.remove(req.params.id);
+      console.log(deleted);
+      res.status(204).end();
+   } catch(error) {
+      res.status(500).json({msg:error});
+   }
+})
 function validateById(req,res,next) {
     projects.get(req.params.id)
             .then( project => {
