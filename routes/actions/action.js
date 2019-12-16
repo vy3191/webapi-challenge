@@ -20,6 +20,22 @@ router.post("/", validateActions, async (req,res) => {
 
 });
 
+router.put("/:actionId", validateActions, getActionsById, async(req,res) => {
+    try{
+       const body = {
+         description:req.body.description,
+         notes:req.body.notes,
+         project_id: req.params.id
+       }
+       await actions.update(req.params.actionId, body);
+       const updatedAction = await actions.get(req.params.actionId);
+       res.status(200).json(updatedAction);
+
+    } catch(error) {
+      res.status(500).json({msg:`Something went wrong--server error`});
+    }
+})
+
 function getActionsById(req,res,next) {
     actions.get(req.params.actionId)
           .then( action => {
