@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const router = express.Router({mergeParams:true});
 const projects = require("../../data/helpers/projectModel");
 
 router.get("/", async (req,res) => {
@@ -13,7 +13,17 @@ router.get("/", async (req,res) => {
 
 router.get("/:id", validateById, (req,res) => {
      res.status(200).json(req.project);
-})
+});
+
+router.get("/:id/actions", validateById, async(req,res) => {
+     try {
+        const actions = await projects.getProjectActions(req.params.id);
+        if(actions.length === 0) res.status(404).json({msg:`Actions not found`});
+        res.status(200).json(actions)
+     } catch(error) {
+      res.status(500).json({msg:error}); 
+     }
+});
 
 router.post("/", validateProject, async(req,res) => {
      try {
@@ -54,9 +64,11 @@ router.delete("/:id", validateById, async (req,res) => {
 function validateById(req,res,next) {
     projects.get(req.params.id)
             .then( project => {
-                if(project) {
+                if(project.name) {
                    req.project = project;
                    next();
+                } else {
+                  res.status(404).json({msg:`Project with the ${req.params.id} not found`})
                 }
             })
             .catch(err => {
