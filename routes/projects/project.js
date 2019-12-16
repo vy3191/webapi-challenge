@@ -25,6 +25,34 @@ router.post("/", validateProject, async(req,res) => {
 
 });
 
+router.put("/:id",validateProject, validateById, async (req,res) => {
+    try {
+       const payload = {
+         name: req.body.name,
+         description: req.body.description
+       }
+       await projects.update(req.params.id, payload);
+       const project = await projects.get(req.params.id);
+       res.status(201).json(project)
+    } catch(error) {
+       res.status(500).json({msg:error});
+    }
+});
+
+
+function validateById(req,res,next) {
+    projects.get(req.params.id)
+            .then( project => {
+                if(project) {
+                   req.project = project;
+                   next();
+                }
+            })
+            .catch(err => {
+               res.status(500).json({msg:`Something went wrong`});
+            })
+}
+
 
 function validateProject(req,res,next) {
     const { name, description } = req.body;
