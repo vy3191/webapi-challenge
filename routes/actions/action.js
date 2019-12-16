@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router({mergeParams:true});
 const actions = require("../../data/helpers/actionModel");
 
-router.get("/:actionId",getActionsById, async (req,res) => {
+router.get("/:actionId",validateActionById, async (req,res) => {
       res.json(req.action)
 });
 
@@ -20,7 +20,7 @@ router.post("/", validateActions, async (req,res) => {
 
 });
 
-router.put("/:actionId", validateActions, getActionsById, async(req,res) => {
+router.put("/:actionId", validateActions, validateActionById, async(req,res) => {
     try{
        const body = {
          description:req.body.description,
@@ -29,14 +29,23 @@ router.put("/:actionId", validateActions, getActionsById, async(req,res) => {
        }
        await actions.update(req.params.actionId, body);
        const updatedAction = await actions.get(req.params.actionId);
-       res.status(200).json(updatedAction);
+       res.status(200).json({msg:`No. of deleted actions ${updatedAction}`});
 
     } catch(error) {
       res.status(500).json({msg:`Something went wrong--server error`});
     }
-})
+});
 
-function getActionsById(req,res,next) {
+router.delete("/:actionId", validateActionById, async (req,res) => {
+   try {
+      const deleted = await actions.remove(req.params.actionId);
+      res.status(200).json(deleted);
+   } catch(error) {
+      res.status(500).json({msg:`Something went wrong--server error`});
+   }
+});
+
+function validateActionById(req,res,next) {
     actions.get(req.params.actionId)
           .then( action => {
              console.log(action)
