@@ -12,3 +12,23 @@ I need this code, just don't know where, perhaps should make some middleware, do
 
 Go code!
 */
+
+const express = require("express");
+const helmet = require("helmet");
+const morgan = require("morgan");
+
+const PORT  = 8700;
+
+const server = express();
+
+server.use(helmet());
+server.use(morgan());
+server.use(express.json());
+
+server.get("/", (req,res) => {
+   res.status(200).json({msg:`App is up and running now`});
+});
+
+server.listen(PORT, () => {
+   console.log(`Server is running at http://localhost:${PORT}`);
+})
