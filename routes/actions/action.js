@@ -29,7 +29,7 @@ router.put("/:actionId", validateActions, validateActionById, async(req,res) => 
        }
        await actions.update(req.params.actionId, body);
        const updatedAction = await actions.get(req.params.actionId);
-       res.status(200).json({msg:`No. of deleted actions ${updatedAction}`});
+       res.status(200).json(updatedAction);
 
     } catch(error) {
       res.status(500).json({msg:`Something went wrong--server error`});
